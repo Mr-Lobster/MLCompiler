@@ -1,0 +1,1 @@
+int$e3d2,$c617;$e3d2=9;$c617=4;$c617=($e3d2+2)+3+32*($c617+11)*2*909; if($e3d2>$e3d2*9)thenbegin$c617=$e3d2+6;$c617=$e3d2+5;end;else$e3d2=$e3d2*5;while($c617*974!=$e3d2*2)dobegin$e3d2=$c617*9;$c617=$e3d2+67;end;
