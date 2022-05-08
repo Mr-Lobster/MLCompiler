@@ -18,9 +18,8 @@ public:
 
 	void printTuple(string type, string sign);
 
-private:
-
 	identifierTable iTable;//保存标识符(变量)
+private:
 
 	string inputProgram;//保存程序源代码的字符串
 

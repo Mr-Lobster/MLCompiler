@@ -23,7 +23,9 @@ int main() {
 	}
 	fin.close();
 
+	//传入程序代码
 	Compiler myCompiler(inputFile);
-	myCompiler.nextInput();
+	//启动编译器
+	myCompiler.run();
 	return 0;
 }
