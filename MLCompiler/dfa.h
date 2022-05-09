@@ -4,6 +4,7 @@
 #include <iomanip>
 #include <string>
 #include "twoTuple.h"
+#include <stdlib.h>
 using namespace std;
 
 class DFA {
@@ -154,7 +155,7 @@ twoTuple DFA::runOnce() {
 			}
 			else
 			{
-				return twoTuple("关系运算符",temp);
+				return twoTuple("关系运算符", temp);
 			}
 		}
 
@@ -332,7 +333,16 @@ twoTuple DFA::runOnce() {
 		}
 
 		//错误处理
-		cout << "无法识别的符号: " << symbol << endl;
+		cout << "无法识别的符号: " << temp << " + " << symbol << " " << "输入回车跳过该单词..." << endl;
+		//等待回车信号
+		int x = 0;
+		do
+		{
+			x = getchar();
+			printf("%c", x);
+		} while (x != '\n');
+
+		//重置状态,跳过该单词
 		resetState();
 		//读头后移一位
 		inputPointer++;

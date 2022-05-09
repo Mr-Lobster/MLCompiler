@@ -54,14 +54,14 @@ void middleCodeTable::clear() {
 }
 
 void middleCodeTable::dump() {
-	cout << endl << endl;
-	cout << "中间代码四元式表:" << endl;
+	fout << endl;
+	fout << "中间代码四元式表:" << endl;
 
 	//通过迭代器访问
 	vector<fourTuple>::iterator iter;
 	int index = 0;
 	for (iter = table.begin(); iter != table.end(); iter++)
 	{
-		cout <<"(" << index++ << ")" << " ( " << (*iter).symbol << " , " << (*iter).operand1 << " , " << (*iter).operand2 << " , " << (*iter).result << " )" << endl;
+		fout << "(" << index++ << ")" << " ( " << (*iter).symbol << " , " << (*iter).operand1 << " , " << (*iter).operand2 << " , " << (*iter).result << " )" << endl;
 	}
 }

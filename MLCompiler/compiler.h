@@ -51,9 +51,9 @@ twoTuple Compiler::nextInput() {
 bool Compiler::match(string type) {
 	if (type != word.type) {
 		cout << endl << endl;
-		cout << "Error!" << endl;
-		cout << "匹配失败! " << word.type << " != " << type << endl;
-		cout << "Error!" << endl;
+		cout << "Error: 语法分析出现错误" << endl;
+		cout << "匹配失败 " << word.type << " != " << type << endl;
+		cout << "Error: 语法分析出现错误" << endl;
 		cout << endl << endl;
 		return false;
 	}
@@ -68,6 +68,7 @@ bool Compiler::match(string type) {
 
 void Compiler::run() {
 	cout << "词法分析开始" << endl;
+	cout << "------------------------------------------------------------" << endl << endl;
 	word = this->nextInput();
 	cout << "-> 识别单词: " << word << endl;
 	this->parseProgram();
@@ -81,6 +82,7 @@ bool Compiler::parseProgram() {
 	this->parseExplainVars();
 	this->match("分号");
 	this->parseStatementSection();
+	cout << endl << "------------------------------------------------------------" << endl;
 	cout << "语法分析结束" << endl;
 	return true;
 }

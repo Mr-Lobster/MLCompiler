@@ -46,7 +46,10 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="201921147181in.txt">
+    <Text Include="in.txt">
+      <Filter>源文件</Filter>
+    </Text>
+    <Text Include="out.txt">
       <Filter>源文件</Filter>
     </Text>
   </ItemGroup>
