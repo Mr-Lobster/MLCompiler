@@ -5,7 +5,6 @@
 #include "tempVarTable.h"
 using namespace std;
 
-
 class Compiler {
 private:
 	DFA dfa;//词法分析DFA
@@ -32,7 +31,8 @@ private:
 	identifier parseElement();
 	bool parseCompoundStatement();
 	bool parseNestStatement();
-
+	string myPlus(string, string);
+	string myMult(string, string);
 public:
 	Compiler(string);
 	void run();
@@ -168,6 +168,9 @@ bool Compiler::parseAssignStatement() {
 	identifier E = parseExpression();//创建一个变量来接收表达式的值
 	codetable.add("=", E.name, "null", identifiername);
 	cout << "产生赋值四元式" << endl;
+	//更新标识符的值
+	dfa.iTable.updateIdentifierValueByName(identifiername, E.value);
+	cout << endl << endl << E.name<<"  "<< E.value << endl << endl;
 	return true;
 }
 
@@ -219,6 +222,9 @@ identifier Compiler::parseExpressionPrime(identifier E1) {
 		identifier T = tempvartable.getNewTempVar();//创建临时变量来保存T1+T2的值
 		codetable.add("+", E1.name, E2.name, T.name);
 		cout << "产生加法四元式" << endl;
+		//进行加法运算
+		T.value = this->myPlus(E1.value, E2.value);
+		//加法运算结束
 		identifier E = parseExpressionPrime(T);//将 加法得到的结果 传递给表达式prime 得到下一次计算的结果
 		return E;
 	}
@@ -243,6 +249,11 @@ identifier Compiler::parseItemPrime(identifier E1) {
 		identifier T = tempvartable.getNewTempVar();//生成临时变量T 用于保存乘法运算的值
 		codetable.add("*", E1.name, E2.name, T.name);
 		cout << "产生乘法四元式" << endl;
+		//进行乘法运算
+		//cout <<endl<< "进行乘法运算  " << E1.value <<"  " << E2.value << endl;
+		T.value = this->myMult(E1.value, E2.value);
+		//cout << T.value << endl;
+		//加法乘法结束
 		identifier E = parseItemPrime(T);//将 乘法运算结果 传递给项prime进行进一步运算
 		return E;
 	}
@@ -255,13 +266,15 @@ identifier Compiler::parseItemPrime(identifier E1) {
 identifier Compiler::parseElement() {
 	cout << "推导: <因子> → <标识符>|<常量>|(<表达式>)" << endl;
 	if (word.type == "标识符") {
-		identifier E(word.value);
+		identifier E(word.value);//给E 标识符的名字
+		E.value = dfa.iTable.getIdentifierValueByName(word.value);//给E 标识符的值
 		match("标识符");
 		E.type = "int";
 		return E;
 	}
 	if (word.type == "数字序列") {
-		identifier E(word.value);
+		identifier E(word.value);//给E 标识符的名字
+		E.value = word.value;//给E 标识符的值
 		match("数字序列");
 		E.type = "int";
 		return E;
@@ -292,4 +305,17 @@ bool Compiler::parseNestStatement() {
 		parseCompoundStatement();
 	}
 	return true;
+}
+
+string Compiler::myPlus(string str1, string str2) {
+	double x = stod(str1);
+	double y = stod(str2);
+	return to_string(x + y);
+}
+
+string Compiler::myMult(string str1, string str2) {
+
+	double x = stod(str1);
+	double y = stod(str2);
+	return to_string(x * y);
 }
