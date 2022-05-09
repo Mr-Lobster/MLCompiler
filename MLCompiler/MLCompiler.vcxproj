@@ -139,6 +139,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="fourTuple.h" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -146,6 +147,8 @@
     <ClInclude Include="dfa.h" />
     <ClInclude Include="identifier.h" />
     <ClInclude Include="identifierTable.h" />
+    <ClInclude Include="middleCodeTable.h" />
+    <ClInclude Include="tempVarTable.h" />
     <ClInclude Include="twoTuple.h" />
   </ItemGroup>
   <ItemGroup>

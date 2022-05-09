@@ -1,20 +1,23 @@
 #pragma once
 #include  <iostream>
 #include  "dfa.h"
-#include  "twoTuple.h"
+#include "middleCodeTable.h"
+#include "tempVarTable.h"
 using namespace std;
 
 
 class Compiler {
 private:
 	DFA dfa;//词法分析DFA
-	twoTuple word;//用于保存每次词法分析输出而原始
+	twoTuple word;//用于保存每次词法分析输出的二元式
 	twoTuple nextInput();//获取下一个词法分析结果的二元式
+	middleCodeTable codetable;//中间代码表 四元式
+	tempVarTavble tempvartable;//临时变量表
 	bool match(string);
 	bool parseProgram();
 	bool parseExplainVars();
-	bool parseIdentifierList();
-	bool parseIdentifierListPrime();
+	bool parseIdentifierList(string);
+	bool parseIdentifierListPrime(string);
 	bool parseStatementSection();
 	bool parseStatementSectionPrime();
 	bool parseStatement();
@@ -22,11 +25,11 @@ private:
 	bool parseIfStatement();
 	bool parseLoopStatement();
 	bool parseCondition();
-	bool parseExpression();
-	bool parseExpressionPrime();
-	bool parseItem();
-	bool parseItemPrime();
-	bool parseElement();
+	identifier parseExpression();
+	identifier parseExpressionPrime(identifier);
+	identifier parseItem();
+	identifier parseItemPrime(identifier);
+	identifier parseElement();
 	bool parseNums();
 	bool parseNumsPrime();
 	bool parseCompoundStatement();
@@ -51,7 +54,7 @@ bool Compiler::match(string type) {
 	if (type != word.type) {
 		cout << endl << endl;
 		cout << "Error!" << endl;
-		cout << "匹配失败! "<<word.type<<" != "<<type << endl;
+		cout << "匹配失败! " << word.type << " != " << type << endl;
 		cout << "Error!" << endl;
 		cout << endl << endl;
 		return false;
@@ -66,10 +69,13 @@ bool Compiler::match(string type) {
 }
 
 void Compiler::run() {
+	cout << "词法分析开始" << endl;
 	word = this->nextInput();
 	cout << "-> 识别单词: " << word << endl;
 	this->parseProgram();
-	this->dfa.iTable.dump();
+	cout << this->dfa.iTable.dump();
+	this->codetable.dump();
+	this->tempvartable.dump();
 }
 
 bool Compiler::parseProgram() {
@@ -84,23 +90,31 @@ bool Compiler::parseProgram() {
 bool Compiler::parseExplainVars() {
 	cout << "推导: <变量说明部分> → <变量说明><标识符列表>" << endl;
 	match("int");
-	this->parseIdentifierList();
+	this->parseIdentifierList("int");//把变量类型传递给 标识符列表
 	return true;
 }
 
-bool Compiler::parseIdentifierList() {
+bool Compiler::parseIdentifierList(string type) {
 	cout << "推导: <标识符列表> → <标识符><标识符列表Prime>" << endl;
-	this->match("标识符");
-	this->parseIdentifierListPrime();
+	if (word.type == "标识符") {
+		dfa.iTable.updateIdentifierTypeByName(word.value, "int");//更新变量的类型 word 为词法分析输出的二元式 word.value 为变量名字
+		cout << "Update 更新标识符: " << word.value << " 的类型为 int" << endl;
+		this->match("标识符");
+	}
+	this->parseIdentifierListPrime(type);
 	return true;
 }
 
-bool Compiler::parseIdentifierListPrime() {
+bool Compiler::parseIdentifierListPrime(string type) {
 	cout << "推导: <标识符列表Prime> →,<标识符><标识符列表Prime>|e" << endl;
 	if (word.type == "逗号") {
 		this->match("逗号");
-		this->match("标识符");
-		parseIdentifierListPrime();
+		if (word.type == "标识符") {
+			dfa.iTable.updateIdentifierTypeByName(word.value, "int");
+			cout << "Update 更新标识符: " << word.value << " 的类型为 int" << endl;
+			this->match("标识符");
+		}
+		parseIdentifierListPrime(type);
 	}
 	else {
 	}
@@ -146,9 +160,16 @@ bool Compiler::parseStatement() {
 
 bool Compiler::parseAssignStatement() {
 	cout << "推导: <赋值语句> →<标识符>=<表达式>" << endl;
-	match("标识符");
+	string identifiername;
+	if (word.type == "标识符 ") {
+		identifiername = word.value;//保存标识符的名字
+		match("标识符");
+	}
+
 	match("赋值号");
-	parseExpression();
+	identifier E = parseExpression();//创建一个临时变量 来接收表达式的值
+	codetable.add("=", E.name, "null", identifiername);
+	cout << "产生四元式" << endl;
 	return true;
 }
 
@@ -185,38 +206,45 @@ bool Compiler::parseCondition() {
 	return true;
 }
 
-bool Compiler::parseExpression() {
+identifier Compiler::parseExpression() {
 	cout << "推导: <表达式> → <项><表达式Prime>" << endl;
-	parseItem();
-	parseExpressionPrime();
-	return true;
+	identifier E1 = parseItem();
+	identifier E2 = parseExpressionPrime(E1);
+	return E2;
 }
 
-bool Compiler::parseExpressionPrime() {
+identifier Compiler::parseExpressionPrime(identifier E1) {
 	cout << "推导: <表达式Prime> →<加法运算符><项><表达式Prime>|e" << endl;
 	if (word.type == "加号") {
 		match("加号");
-		parseItem();
-		parseExpressionPrime();
+		identifier E2 = parseItem();//当前项的值
+		identifier T = tempvartable.getNewTempVar();
+		codetable.add("+", E1.name, E2.name, T.name);
+		cout << "产生加法四元式" << endl;
+		identifier E = parseExpressionPrime(T);//将当前值传递给表达式prime
 	}
 	else {
-
+		return E1;
 	}
-	return true;
+	return;
 }
 
-bool Compiler::parseItem() {
+identifier Compiler::parseItem() {
 	cout << "推导: <项> →<因子><项Prime>" << endl;
-	parseElement();
-	parseItemPrime();
-	return true;
+	identifier E();
+	identifier E1 = parseElement();//保存因子的值
+	identifier E2 = parseItemPrime(E1);
+	return E2;
 }
 
-bool Compiler::parseItemPrime() {
+identifier Compiler::parseItemPrime(identifier E1) {
 	cout << "推导: <项Prime> →<乘法运算符><因子><项Prime>|e" << endl;
 	if (word.type == "乘号") {
 		match("乘号");
-		parseElement();
+		identifier E2=parseElement();//保存因子的值
+		identifier T = tempvartable.getNewTempVar();
+		codetable.add("*", E1.name, E2.name, T.name);
+		cout << "产生乘法四元式" << endl;
 		parseItemPrime();
 	}
 	else {
@@ -252,6 +280,7 @@ bool Compiler::parseNumsPrime() {
 	cout << "推导: <数字序列Prime> → <数字><数字序列Prime>|e" << endl;
 	return true;
 }
+
 bool Compiler::parseCompoundStatement() {
 	cout << "推导: <复合语句> → begin <语句部分> end" << endl;
 	match("begin");

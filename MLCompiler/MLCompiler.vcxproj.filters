@@ -18,6 +18,9 @@
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="fourTuple.h">
+      <Filter>头文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dfa.h">
@@ -33,6 +36,12 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="compiler.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="middleCodeTable.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="tempVarTable.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

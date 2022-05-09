@@ -108,7 +108,7 @@ twoTuple DFA::runOnce() {
 			{
 				//变量名已经结束
 				iTable.add(temp);
-				return twoTuple("标识符", temp);
+				return twoTuple("标识符", temp);//temp为变量的名称
 			}
 		}
 

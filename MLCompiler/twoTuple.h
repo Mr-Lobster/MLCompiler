@@ -13,6 +13,7 @@ public:
 	}
 
 };
+
 ostream& operator<<(ostream& out, const twoTuple& tuple)
 {
 	out << "(" << setw(10) << tuple.type << "  £¬" << setw(8) << tuple.value << "     )" ;
