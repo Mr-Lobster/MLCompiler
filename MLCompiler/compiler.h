@@ -188,11 +188,11 @@ bool Compiler::parseIfStatement() {
 	parseNestStatement();
 	int exitIndex = codetable.NXQ();
 	codetable.add("j", "null", "null", "0");//需要回填
-	codetable.Backapth(falseExitIndex, to_string(codetable.NXQ()));
+	codetable.Backpath(falseExitIndex, to_string(codetable.NXQ()));
 	match("分号");
 	match("else");
 	parseNestStatement();
-	codetable.Backapth(exitIndex, to_string(codetable.NXQ()));
+	codetable.Backpath(exitIndex, to_string(codetable.NXQ()));
 	return true;
 }
 
@@ -210,7 +210,7 @@ bool Compiler::parseLoopStatement() {
 	parseNestStatement();
 	codetable.add("j", "null", "null", to_string(initIndex));
 	//开始回填
-	codetable.Backapth(falseExitIndex, to_string(codetable.NXQ()));
+	codetable.Backpath(falseExitIndex, to_string(codetable.NXQ()));
 	return true;
 }
 

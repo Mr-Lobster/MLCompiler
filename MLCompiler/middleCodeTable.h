@@ -13,7 +13,7 @@ public:
 	int NXQ();
 	vector<fourTuple> table;
 	bool add(string, string, string, string);
-	bool Backapth(int index, string result);
+	bool Backpath(int index, string result);
 	void clear();
 	void dump();
 private:
@@ -40,7 +40,7 @@ int middleCodeTable::NXQ() {
 	return this->table.size();
 }
 
-bool middleCodeTable::Backapth(int index, string result) {
+bool middleCodeTable::Backpath(int index, string result) {
 	if (index < 0 || index > this->table.size() - 1) {
 		return false;
 	}

@@ -1,1 +1,1 @@
-int$v0i;$v0i=8;$v0i=2*$v0i+($v0i*1)*$v0i*$v0i*917*($v0i*258)*($v0i*41)*($v0i*32)*($v0i+2)+2*($v0i+8)+($v0i*4)*$v0i+667*($v0i+25)*$v0i*$v0i+($v0i+7)*$v0i; if($v0i+4<$v0i)then$v0i=$v0i*6;else$v0i=$v0i*32;while($v0i*7>=$v0i)dobegin$v0i=$v0i*76;$v0i=$v0i*8;end;
+int$m8;$m8=1;$m8=4*$m8; if($m8>=$m8+7)then$m8=$m8*811;else$m8=$m8+7;while($m8+4==$m8+4)do$m8=$m8*617;
