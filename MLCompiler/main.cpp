@@ -1,7 +1,5 @@
 ﻿#include<iostream>
-#include <vector>
 #include <fstream>
-#include "dfa.h"
 #include "compiler.h"
 using namespace std;
 

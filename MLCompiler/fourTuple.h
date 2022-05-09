@@ -4,6 +4,7 @@
 using namespace std;
 
 class fourTuple {
+	
 public:
 	string symbol;
 	string operand1;
@@ -18,8 +19,9 @@ public:
 
 };
 
-ostream& operator<<(ostream& out, const fourTuple& tuple)
+/*
+static ostream& operator<<(ostream& out, const fourTuple& tuple)
 {
 	out << "(" << tuple.symbol << "," << tuple.operand1 << "," << tuple.operand2 << "," << tuple.result << "";
 	return out;
-}
+}*/

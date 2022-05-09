@@ -12,7 +12,7 @@ private:
 	twoTuple word;//用于保存每次词法分析输出的二元式
 	twoTuple nextInput();//获取下一个词法分析结果的二元式
 	middleCodeTable codetable;//中间代码表 四元式
-	tempVarTavble tempvartable;//临时变量表
+	tempVarTavble tempvartable;//临时变量表 用于保存 + * 运算的结果
 	bool match(string);
 	bool parseProgram();
 	bool parseExplainVars();
@@ -30,8 +30,6 @@ private:
 	identifier parseItem();
 	identifier parseItemPrime(identifier);
 	identifier parseElement();
-	bool parseNums();
-	bool parseNumsPrime();
 	bool parseCompoundStatement();
 	bool parseNestStatement();
 
@@ -161,15 +159,15 @@ bool Compiler::parseStatement() {
 bool Compiler::parseAssignStatement() {
 	cout << "推导: <赋值语句> →<标识符>=<表达式>" << endl;
 	string identifiername;
-	if (word.type == "标识符 ") {
+	if (word.type == "标识符") {
 		identifiername = word.value;//保存标识符的名字
 		match("标识符");
 	}
 
 	match("赋值号");
-	identifier E = parseExpression();//创建一个临时变量 来接收表达式的值
+	identifier E = parseExpression();//创建一个变量来接收表达式的值
 	codetable.add("=", E.name, "null", identifiername);
-	cout << "产生四元式" << endl;
+	cout << "产生赋值四元式" << endl;
 	return true;
 }
 
@@ -214,24 +212,24 @@ identifier Compiler::parseExpression() {
 }
 
 identifier Compiler::parseExpressionPrime(identifier E1) {
-	cout << "推导: <表达式Prime> →<加法运算符><项><表达式Prime>|e" << endl;
+	cout << "推导: <表达式Prime> → <加法运算符><项><表达式Prime>|e" << endl;
 	if (word.type == "加号") {
 		match("加号");
 		identifier E2 = parseItem();//当前项的值
-		identifier T = tempvartable.getNewTempVar();
+		identifier T = tempvartable.getNewTempVar();//创建临时变量来保存T1+T2的值
 		codetable.add("+", E1.name, E2.name, T.name);
 		cout << "产生加法四元式" << endl;
-		identifier E = parseExpressionPrime(T);//将当前值传递给表达式prime
+		identifier E = parseExpressionPrime(T);//将 加法得到的结果 传递给表达式prime 得到下一次计算的结果
+		return E;
 	}
 	else {
 		return E1;
 	}
-	return;
+	return identifier("Error!");
 }
 
 identifier Compiler::parseItem() {
-	cout << "推导: <项> →<因子><项Prime>" << endl;
-	identifier E();
+	cout << "推导: <项> → <因子><项Prime>" << endl;
 	identifier E1 = parseElement();//保存因子的值
 	identifier E2 = parseItemPrime(E1);
 	return E2;
@@ -241,44 +239,40 @@ identifier Compiler::parseItemPrime(identifier E1) {
 	cout << "推导: <项Prime> →<乘法运算符><因子><项Prime>|e" << endl;
 	if (word.type == "乘号") {
 		match("乘号");
-		identifier E2=parseElement();//保存因子的值
-		identifier T = tempvartable.getNewTempVar();
+		identifier E2 = parseElement();//保存因子的值
+		identifier T = tempvartable.getNewTempVar();//生成临时变量T 用于保存乘法运算的值
 		codetable.add("*", E1.name, E2.name, T.name);
 		cout << "产生乘法四元式" << endl;
-		parseItemPrime();
+		identifier E = parseItemPrime(T);//将 乘法运算结果 传递给项prime进行进一步运算
+		return E;
 	}
 	else {
-
+		return E1;
 	}
-	return true;
+	return identifier("Error!");
 }
 
-bool Compiler::parseElement() {
+identifier Compiler::parseElement() {
 	cout << "推导: <因子> → <标识符>|<常量>|(<表达式>)" << endl;
 	if (word.type == "标识符") {
+		identifier E(word.value);
 		match("标识符");
+		E.type = "int";
+		return E;
 	}
 	if (word.type == "数字序列") {
+		identifier E(word.value);
 		match("数字序列");
+		E.type = "int";
+		return E;
 	}
 	if (word.type == "左括号") {
 		match("左括号");
-		parseExpression();
+		identifier E = parseExpression();
 		match("右括号");
+		return E;
 	}
-	return true;
-}
-
-//好像不需要
-bool Compiler::parseNums() {
-	cout << "推导: <数字序列> → <数字><数字序列Prime>" << endl;
-	return true;
-}
-
-//好像不需要
-bool Compiler::parseNumsPrime() {
-	cout << "推导: <数字序列Prime> → <数字><数字序列Prime>|e" << endl;
-	return true;
+	return identifier("Error!");
 }
 
 bool Compiler::parseCompoundStatement() {

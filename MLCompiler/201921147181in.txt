@@ -1,1 +1,1 @@
-int$l1w8,$a892;$l1w8=426;$a892=396;$l1w8=($a892*93)*$a892*8*($l1w8+385)*89+3*$l1w8*1*$a892*27*$a892;while($l1w8>$a892*9)do$l1w8=$l1w8*221; if($a892+487>=$l1w8+191)thenbegin$l1w8=$l1w8*247;$a892=$l1w8+3;end;elsebegin$l1w8=$a892+974;$a892=$l1w8*964;end;
+int$q;$q=7;$q=$q+6*8*8*6+($q+32)*$q+($q*1)*($q+87)+1+$q*$q*$q*($q*59)+($q+91); if($q+187!=$q)thenbegin$q=$q*24;$q=$q*912;end;elsebegin$q=$q*5;$q=$q+530;end;while($q+3==$q*3)dobegin$q=$q+800;$q=$q*10;end;
