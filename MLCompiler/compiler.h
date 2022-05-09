@@ -23,7 +23,7 @@ private:
 	bool parseAssignStatement();
 	bool parseIfStatement();
 	bool parseLoopStatement();
-	bool parseCondition();
+	identifier parseCondition();
 	identifier parseExpression();
 	identifier parseExpressionPrime(identifier);
 	identifier parseItem();
@@ -170,7 +170,7 @@ bool Compiler::parseAssignStatement() {
 	cout << "产生赋值四元式" << endl;
 	//更新标识符的值
 	dfa.iTable.updateIdentifierValueByName(identifiername, E.value);
-	cout << endl << endl << E.name<<"  "<< E.value << endl << endl;
+	//cout << endl << endl << E.name<<"  "<< E.value << endl << endl;
 	return true;
 }
 
@@ -178,13 +178,21 @@ bool Compiler::parseIfStatement() {
 	cout << "推导: <条件语句> → if （<条件>） then <嵌套语句>; else <嵌套语句>" << endl;
 	match("if");
 	match("左括号");
-	parseCondition();
+	identifier E = parseCondition();
 	match("右括号");
 	match("then");
+	codetable.add("jnz", E.name, "null", to_string(codetable.NXQ() + 2));
+	int falseExitIndex = codetable.NXQ();
+	codetable.add("j", "null", "null", "0");//需要回填
+
 	parseNestStatement();
+	int exitIndex = codetable.NXQ();
+	codetable.add("j", "null", "null", "0");//需要回填
+	codetable.Backapth(falseExitIndex, to_string(codetable.NXQ()));
 	match("分号");
 	match("else");
 	parseNestStatement();
+	codetable.Backapth(exitIndex, to_string(codetable.NXQ()));
 	return true;
 }
 
@@ -192,19 +200,79 @@ bool Compiler::parseLoopStatement() {
 	cout << "推导: <循环语句> → while （<条件>） do <嵌套语句>" << endl;
 	match("while");
 	match("左括号");
-	parseCondition();
+	int initIndex = codetable.NXQ();//保存条件产生的四元式index
+	identifier E = parseCondition();//获取条件返回的临时变量
 	match("右括号");
 	match("do");
+	codetable.add("jnz", E.name, "null", to_string(codetable.NXQ() + 2));
+	int falseExitIndex = codetable.NXQ();
+	codetable.add("j", "null", "null", "null");//等待回填假出口
 	parseNestStatement();
+	codetable.add("j", "null", "null", to_string(initIndex));
+	//开始回填
+	codetable.Backapth(falseExitIndex, to_string(codetable.NXQ()));
 	return true;
 }
 
-bool Compiler::parseCondition() {
+identifier Compiler::parseCondition() {
 	cout << "推导: <条件> → <表达式><关系运算符><表达式>" << endl;
-	parseExpression();
-	match("关系运算符");
-	parseExpression();
-	return true;
+	identifier E1 = parseExpression();
+
+	string logicOperator = "";
+	if (word.type == "关系运算符") {
+		logicOperator = word.value;
+		match("关系运算符");
+	}
+
+	identifier E2 = parseExpression();
+
+	//产生中间代码
+	identifier T = tempvartable.getNewTempVar();
+	codetable.add(logicOperator, E1.name, E2.name, T.name);
+	cout << "产生逻辑计算四元式" << endl;
+	//开始计算T的值
+	T.type = "bool";
+	bool flag = false;//满足条件就是true
+	double value1 = dfa.iTable.getIdentifierValueByNameAsDouble(E1.name);
+	double value2 = dfa.iTable.getIdentifierValueByNameAsDouble(E2.name);
+	if (logicOperator == "<") {
+		if (value1 < value2)
+		{
+			flag = true;
+		}
+	}
+	if (logicOperator == ">") {
+		if (value1 > value2)
+		{
+			flag = true;
+		}
+	}
+	if (logicOperator == "!=") {
+		if (value1 != value2)
+		{
+			flag = true;
+		}
+	}
+	if (logicOperator == ">=") {
+		if (value1 >= value2)
+		{
+			flag = true;
+		}
+	}
+	if (logicOperator == "<=") {
+		if (value1 <= value2)
+		{
+			flag = true;
+		}
+	}
+	if (logicOperator == "==") {
+		if (value1 == value2)
+		{
+			flag = true;
+		}
+	}
+	T.value = flag == true ? true : false;
+	return T;
 }
 
 identifier Compiler::parseExpression() {

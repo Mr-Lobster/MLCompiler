@@ -4,6 +4,7 @@
 #include "fourTuple.h"
 using namespace std;
 
+//中间代码 四元式表
 class middleCodeTable
 {
 public:

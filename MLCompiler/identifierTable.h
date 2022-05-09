@@ -1,5 +1,6 @@
 #pragma once
 #include "identifier.h"
+#include <string>
 #include <vector>
 
 class identifierTable
@@ -20,6 +21,7 @@ public:
 	int getIdentifierIndexByName(string);
 	string getIdentifierValueByName(string);
 	int getIdentifierValueByNameAsInt(string);
+	double getIdentifierValueByNameAsDouble(string);
 	void clear();
 	string dump();
 };
@@ -151,4 +153,15 @@ int identifierTable::getIdentifierValueByNameAsInt(string name) {
 		return -1;
 	}
 	return atoi(this->getIdentifierValueByName(name).c_str());
+}
+
+//根据名称返回标识符的值 double
+double identifierTable::getIdentifierValueByNameAsDouble(string name) {
+	if (this->existIdentifier(name) == false) {
+		return -1;
+	}
+	if (this->getIdentifierValueByName(name) == "") {
+		return -1;
+	}
+	return stod(this->getIdentifierValueByName(name));
 }
